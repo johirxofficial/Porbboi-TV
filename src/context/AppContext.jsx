@@ -15,43 +15,42 @@ export const AppProvider = ({ children }) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        setError(null);
+        // Step 1: Fetch App Config. Replace with your actual API endpoint.
+        // For demonstration, we simulate fetching the JSON you provided.
+        const mockConfigUrl = 'data:application/json,' + encodeURIComponent(JSON.stringify({
+          app_info: {
+            app_name: "Porbboi TV",
+            app_logo: "https://via.placeholder.com/150",
+            version: "1.0.5",
+            description: "Premium Live TV Application",
+            whats_new: "Added PiP mode and Background Play.",
+            download_link: "https://example.com/update.apk",
+            developer_name: "Developer",
+            community_link: "https://t.me/your_telegram_group",
+            notification_text: "Welcome to Porbboi TV! Experience premium live streaming.",
+            m3u_source: "https://iptv-org.github.io/iptv/countries/bd.m3u", // Using a public test list
+            last_update: "2026-05-12"
+          }
+        }));
 
-        // Step 1: Fetch App Config from your live API source
-        const configUrl = 'https://johirxofficial.iam.bd/api/Porbboi%20TV/config.json';
-        const configRes = await fetch(configUrl);
-        
-        if (!configRes.ok) {
-          throw new Error(`Failed to load app configuration. Status: ${configRes.status}`);
-        }
-        
+        const configRes = await fetch(mockConfigUrl);
         const configData = await configRes.json();
         setAppInfo(configData.app_info);
 
-        // Step 2: Fetch M3U Source using the URL from the JSON
-        if (!configData.app_info || !configData.app_info.m3u_source) {
-          throw new Error("M3U source URL is missing from the configuration JSON.");
-        }
-
+        // Step 2: Fetch M3U Source
         const m3uRes = await fetch(configData.app_info.m3u_source);
-        
-        if (!m3uRes.ok) {
-          throw new Error(`Failed to load M3U playlist. Status: ${m3uRes.status}`);
-        }
-        
         const m3uText = await m3uRes.text();
         
-        // Parse the M3U text into channel objects
         const parsedChannels = parseM3U(m3uText);
         setChannels(parsedChannels);
 
-        // Extract unique groups for the category tabs
+        // Extract unique groups
         const uniqueGroups = [...new Set(parsedChannels.map(c => c.group))];
         setGroups(['All', ...uniqueGroups]);
 
       } catch (err) {
-        setError("Failed to load application data. Please check your internet connection or API source.");
-        console.error("Data Fetch Error:", err);
+        setError("Failed to load application data.");
+        console.error(err);
       } finally {
         setLoading(false);
       }
