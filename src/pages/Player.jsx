@@ -33,8 +33,6 @@ export default function Player() {
     };
 
     requestWakeLock();
-    
-    // Re-request on visibility change
     const handleVisibilityChange = () => {
       if (wakeLock !== null && document.visibilityState === 'visible') {
         requestWakeLock();
@@ -59,8 +57,6 @@ export default function Player() {
         } else {
           await videoElement.requestPictureInPicture();
         }
-      } else {
-        alert('PiP is not supported on this browser.');
       }
     } catch (error) {
       console.error("PiP error:", error);
@@ -93,6 +89,16 @@ export default function Player() {
           config={{
             file: {
               forceHLS: true,
+              // HLS-এর কাস্টম কনফিগারেশন Referrer পাঠানোর জন্য
+              hlsOptions: {
+                xhrSetup: function(xhr, url) {
+                  if (currentChannel.referrer) {
+                    // কিছু সার্ভার কাস্টম হেডারে Referrer এক্সেপ্ট করে
+                    xhr.setRequestHeader('X-Forwarded-Referer', currentChannel.referrer);
+                    xhr.setRequestHeader('X-Referer', currentChannel.referrer);
+                  }
+                }
+              },
               attributes: {
                 controlsList: 'nodownload',
                 playsInline: true,
@@ -101,7 +107,6 @@ export default function Player() {
           }}
         />
         
-        {/* Custom PiP Button overlaid on player (top right corner) */}
         <button 
           onClick={handlePiP}
           className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/80 rounded text-white z-10 backdrop-blur-sm"
