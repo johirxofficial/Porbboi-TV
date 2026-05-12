@@ -8,28 +8,34 @@ export const parseM3U = (m3uText) => {
     const line = lines[i].trim();
     if (!line) continue;
 
+    // চ্যানেল ইনফরমেশন পার্স করা
     if (line.startsWith('#EXTINF:')) {
       const logoMatch = line.match(/tvg-logo="(.*?)"/);
       const groupMatch = line.match(/group-title="(.*?)"/);
       
-      // Extract name after the last comma
       const commaIndex = line.lastIndexOf(',');
       const name = commaIndex !== -1 ? line.substring(commaIndex + 1).trim() : 'Unknown Channel';
 
       currentChannel = {
-        // Generate a simple unique ID for routing
         id: Math.random().toString(36).substr(2, 9),
         logo: logoMatch ? logoMatch[1] : '',
         group: groupMatch ? groupMatch[1] : 'Uncategorized',
         name: name,
+        referrer: '' // Referrer রাখার জন্য নতুন প্রপার্টি
       };
-    } else if (line.startsWith('http')) {
+    } 
+    // Referrer লিংক পার্স করা
+    else if (line.startsWith('#EXTVLCOPT:http-referrer=')) {
+      // "=" এর পরের অংশটুকু (URL) আলাদা করে নেওয়া
+      currentChannel.referrer = line.substring(line.indexOf('=') + 1).trim();
+    } 
+    // স্ট্রিমের মেইন URL পার্স করা
+    else if (line.startsWith('http')) {
       currentChannel.url = line;
-      // Only push if we have a URL
       if (currentChannel.name) {
         channels.push(currentChannel);
       }
-      currentChannel = {};
+      currentChannel = {}; // পরের চ্যানেলের জন্য রিসেট
     }
   }
   return channels;
