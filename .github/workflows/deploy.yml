@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          # cache: 'npm' লাইনটি সরিয়ে দেওয়া হয়েছে lockfile error ফিক্স করার জন্য
 
       - name: Install dependencies
         run: npm install
