@@ -28,7 +28,7 @@ export const AppProvider = ({ children }) => {
             developer_name: "Developer",
             community_link: "https://t.me/your_telegram_group",
             notification_text: "Welcome to Porbboi TV! Experience premium live streaming.",
-            m3u_source: "https://iptv-org.github.io/iptv/countries/bd.m3u", // Using a public test list
+            m3u_source: "https://raw.githubusercontent.com/srhady/crichd-speical-live-event/refs/heads/main/playlist.m3u", // Using a public test list
             last_update: "2026-05-12"
           }
         }));
